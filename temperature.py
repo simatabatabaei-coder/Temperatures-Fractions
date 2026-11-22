@@ -1,7 +1,8 @@
 class Temperature:
     """Represent a temperature in Celsius, Fahrenheit, or Kelvin."""
 
-    def __init__(self, value, unit="C"):
+    def __init__(self, value: float, unit: str = "C") -> None:
+        """Initialise a temperature, rejecting invalid units and values."""
         unit = unit.upper()
 
         if unit not in ("C", "F", "K"):
@@ -9,6 +10,7 @@ class Temperature:
 
         value = float(value)
 
+        # Lowest allowed temperature in each supported unit.
         absolute_zero = {
             "C": -273.15,
             "F": -459.67,
@@ -22,13 +24,13 @@ class Temperature:
         self._unit = unit
 
     @property
-    def value(self):
-        """Return the temperature value."""
+    def value(self) -> float:
+        """Return the temperature value as a read-only property."""
         return self._value
 
     @property
-    def unit(self):
-        """Return the temperature unit."""
+    def unit(self) -> str:
+        """Return the temperature unit as a read-only property."""
         return self._unit
 
     def to_celsius(self) -> float:
@@ -59,11 +61,10 @@ class Temperature:
             return (self.value - 32) * 5 / 9 + 273.15
 
 
-# Example usage
+# example
 if __name__ == "__main__":
     temperature = Temperature(25, "c")
-    print(temperature.value)
-    print(temperature.unit)
+
     print("Fahrenheit:", temperature.to_fahrenheit())
     print("Celsius:", temperature.to_celsius())
     print("Kelvin:", temperature.to_kelvin())
