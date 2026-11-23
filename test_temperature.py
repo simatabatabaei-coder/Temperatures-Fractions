@@ -77,7 +77,7 @@ def test_conversions(
     }
     temperature = Temperature(reference_values[unit], unit)
 
-    # Use an absolute tolerance to allow small floating-point errors.
+    # Allow small floating-point errors using an absolute tolerance.
     assert temperature.to_celsius() == pytest.approx(
         celsius, abs=1e-9, rel=0
     )
@@ -87,3 +87,44 @@ def test_conversions(
     assert temperature.to_kelvin() == pytest.approx(
         kelvin, abs=1e-9, rel=0
     )
+
+
+@pytest.mark.parametrize(
+    "target_unit, expected_value",
+    [
+        ("C", 25.0),
+        ("c", 25.0),
+        ("F", 77.0),
+        ("f", 77.0),
+        ("K", 298.15),
+        ("k", 298.15),
+    ],
+)
+def test_convert_to(target_unit: str, expected_value: float) -> None:
+    """Check that conversion returns a new object in the requested unit."""
+    original = Temperature(25, "C")
+
+    converted = original.convert_to(target_unit)
+
+    assert isinstance(converted, Temperature)
+    assert converted.unit == target_unit.upper()
+    assert converted.value == pytest.approx(
+        expected_value, abs=1e-9, rel=0
+    )
+
+    # Even conversion to the same unit must create a separate object.
+    assert converted is not original
+
+    # Conversion must preserve the original object's value and unit.
+    assert original.value == 25.0
+    assert original.unit == "C"
+
+
+@pytest.mark.parametrize("target_unit", ["X", "", "Celsius"])
+def test_convert_to_invalid_unit(target_unit: str) -> None:
+    """Check that conversion to an unsupported unit raises ValueError."""
+    temperature = Temperature(25, "C")
+
+    with pytest.raises(ValueError):
+        temperature.convert_to(target_unit)
+        

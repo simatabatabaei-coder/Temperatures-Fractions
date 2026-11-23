@@ -60,11 +60,32 @@ class Temperature:
         else:
             return (self.value - 32) * 5 / 9 + 273.15
 
+    def convert_to(self, target_unit: str) -> "Temperature":
+        """Return a new Temperature object in the requested unit."""
+        target_unit = target_unit.upper()
 
-# example
+        # Reuse the existing methods to calculate the converted value.
+        if target_unit == "C":
+            value = self.to_celsius()
+        elif target_unit == "F":
+            value = self.to_fahrenheit()
+        elif target_unit == "K":
+            value = self.to_kelvin()
+        else:
+            raise ValueError("Unit must be C, F, or K.")
+
+        # Create a separate object, preserving the original temperature.
+        return Temperature(value, target_unit)
+
+
+# Run this example only when the file is executed directly.
 if __name__ == "__main__":
     temperature = Temperature(25, "c")
 
     print("Fahrenheit:", temperature.to_fahrenheit())
     print("Celsius:", temperature.to_celsius())
     print("Kelvin:", temperature.to_kelvin())
+
+    converted = temperature.convert_to("f")
+    print("Converted:", converted.value, converted.unit)
+    
