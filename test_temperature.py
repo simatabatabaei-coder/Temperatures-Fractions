@@ -23,7 +23,7 @@ def test_read_only_properties() -> None:
     """Check that public properties cannot be reassigned."""
     temperature = Temperature(25, "C")
 
-    # Assigning to a property without a setter must raise AttributeError.
+    # Properties without setters must reject assignment.
     with pytest.raises(AttributeError):
         temperature.value = 30
 
@@ -50,3 +50,40 @@ def test_below_absolute_zero(value: float, unit: str) -> None:
     """Check that temperatures below absolute zero are rejected."""
     with pytest.raises(ValueError):
         Temperature(value, unit)
+
+
+@pytest.mark.parametrize(
+    "celsius, fahrenheit, kelvin",
+    [
+        (-273.15, -459.67, 0.0),  # Absolute zero.
+        (-40.0, -40.0, 233.15),   # Celsius–Fahrenheit crossover.
+        (0.0, 32.0, 273.15),     # Freezing point of water.
+        (37.0, 98.6, 310.15),     # Human body temperature.
+        (100.0, 212.0, 373.15),   # Boiling point of water.
+    ],
+)
+@pytest.mark.parametrize("unit", ["C", "F", "K"])
+def test_conversions(
+    celsius: float,
+    fahrenheit: float,
+    kelvin: float,
+    unit: str,
+) -> None:
+    """Check every conversion method from each starting unit."""
+    reference_values = {
+        "C": celsius,
+        "F": fahrenheit,
+        "K": kelvin,
+    }
+    temperature = Temperature(reference_values[unit], unit)
+
+    # Use an absolute tolerance to allow small floating-point errors.
+    assert temperature.to_celsius() == pytest.approx(
+        celsius, abs=1e-9, rel=0
+    )
+    assert temperature.to_fahrenheit() == pytest.approx(
+        fahrenheit, abs=1e-9, rel=0
+    )
+    assert temperature.to_kelvin() == pytest.approx(
+        kelvin, abs=1e-9, rel=0
+    )
